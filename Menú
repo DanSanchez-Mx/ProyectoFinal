@@ -1,0 +1,57 @@
+//
+//  main.c
+//  ProyectoFinal
+//
+//  Created by Dan Sanchez  on 19/12/20.
+//
+
+// Librerias
+#include <stdio.h>
+
+// Declaracion de funciones
+
+
+
+// Variable
+int op;
+
+// Funcion principal
+int main() {
+    // Menú
+    printf("Bienvenido!, porfavor dehite el juego de su eleccion\n");
+    printf("1) Gato\n");
+    printf("2) Conecta 4\n");
+// Por el momento esta parte del menú estará solo comentada hasta que haya hecho los juegos que como ya se detallo solo serán un extra
+//    printf("3) Snake\n");
+//    printf("4) Pong\n");
+    printf("\nEl juego que deseo juegas es: ");
+    scanf("%d", &op);
+    
+    switch (op) {
+        case 1:
+            
+            break;
+            
+            
+        case 2:
+            
+            break;
+            
+            
+        case 3:
+            
+            break;
+        
+            
+        case 4:
+            
+            break;
+            
+        
+        default:
+            printf("\n\nLo sentimos esta opcion aún no esta disponible\n");
+            printf("Por favor, escoga otra opción\n\n");
+            printf("By: Dan Sanchez\n\n");
+            break;
+    }
+}
