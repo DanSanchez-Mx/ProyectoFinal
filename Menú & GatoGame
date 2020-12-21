@@ -1,0 +1,539 @@
+//
+//  main.c
+//  ProyectoFinal
+//
+//  Created by Dan Sanchez  on 19/12/20.
+//
+
+// Librerias
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// Prototipo de funciones
+// Prototipo de funciones del "Gato"
+void loop_JvM (char g [3][3]);
+void loop_JvJ (char g [3][3]);
+void Introduccion (char g [3][3]);
+void Tablero (char g [3][3]);
+void Turno_Jugador1 (char g [3][3]);
+void Turno_Jugador2(char g [3][3]);
+void Turno_IA(char g [3][3]);
+int Condicion (char g [3][3]);
+
+// Variables
+int op, op_Gato;
+char g [3][3];
+
+// Funcion principal
+int main() {
+    // Menú
+    printf("Bienvenido!, porfavor degite el juego de su eleccion\n");
+    printf("1) Gato\n");
+    printf("2) Conecta 4\n");
+// Por el momento esta parte del menú estará solo comentada hasta que haya hecho los juegos que como ya se detallo solo serán un extra
+//    printf("3) Snake\n");
+//    printf("4) Pong\n");
+    printf("\nEl juego que deseo juegas es: ");
+    scanf("%d", &op);
+    printf("\n\n\n\n");
+    
+    switch (op) {
+        
+        // Esta area es para el juego del "Gato con un menú y las funciones correspondientes para el modo de juego que el usuario desee
+        case 1:
+            // Menú del juego
+            printf("Bienvenido al juego de Gato!\n\n");
+            printf("Por favor eliga un modo de juego\n");
+            printf("1) Jugador vs Maquina\n");
+            printf("2) Jugados vs Jugador\n");
+            printf("\nMi eleccion es: ");
+            scanf("%d", &op_Gato);
+            printf("\n\n\n");
+            
+            // Apartir de aqui empieza a correr el juego como tal
+            switch(op_Gato){
+                default:
+                    printf("\n\nLo sentimos esta opcion aún no esta disponible\n");
+                    printf("Por favor, escoga otra opción\n\n");
+                    printf("By: Dan Sanchez\n\n");
+                    break;
+                case 1:
+                    loop_JvM(g);
+                    break;
+                    
+                case 2:
+                    loop_JvJ(g);
+                    break;
+            }
+            break;
+            
+        case 2:
+            
+            
+            break;
+            
+            
+        case 3:
+            
+            break;
+        
+            
+        case 4:
+            
+            break;
+            
+        
+        default:
+            printf("\n\nLo sentimos esta opcion aún no esta disponible\n");
+            printf("Por favor, escoga otra opción\n\n");
+            printf("By: Dan Sanchez\n\n");
+            break;
+    }
+    
+}
+
+// Funciones del "Gato"
+// Funciones donde van anidadas las funciones que hacen correr el juego en el modo "Jugador vs Maquina" y todas queden dentro de una sola funcion
+void loop_JvM (char g [3][3]){
+    int i, j;
+    
+    i = 0;
+    
+    Introduccion(g);
+    do{
+        // system ("clear");
+        Tablero(g);
+        if (i%2 == 0){
+            Turno_Jugador1(g);
+        } else {
+            Turno_IA(g);
+            printf("\n\n");
+        }
+        j = Condicion(g);
+        i++;
+        
+    } while (i <= 9 && j == 2);
+    // system ("clear")
+    Tablero(g);
+    
+    if (j == 0){
+        printf("\nGANASTE!!!\n");
+        printf("By: Dan Sanchez\n\n");
+    } else if (j == 1){
+        printf("\nPerdiste:(\n");
+        printf("By: Dan Sanchez\n\n");
+    } else {
+        printf("\nVaya empate!, Vuelvelo a intentar\n");
+        printf("By: Dan Sanchez\n\n");
+    }
+}
+
+// Funciones donde van anidadas las funciones que hacen correr el juego en el modo "Jugador vs Jugador" y todas queden dentro de una sola funcion
+void loop_JvJ (char g [3][3]){
+    int i, j;
+    
+    i = 0;
+    
+    Introduccion(g);
+    do{
+        // system ("clear");
+        Tablero(g);
+        if (i%2 == 0){
+            Turno_Jugador1(g);
+        } else {
+            Turno_Jugador2(g);
+            printf("\n\n");
+        }
+        j = Condicion(g);
+        i++;
+        
+    } while (i <= 9 && j == 2);
+    // system ("clear")
+    Tablero(g);
+    
+    if (j == 0){
+        printf("\nGANASTE JUGADOR 1!!!\n");
+        printf("By: Dan Sanchez\n\n");
+    } else if (j == 1){
+        printf("\nGANASTE JUGADOR 2!!!\n");
+        printf("By: Dan Sanchez\n\n");
+    } else {
+        printf("\nVaya empate!, Vuelvanlo a intentar\n");
+        printf("By: Dan Sanchez\n\n");
+    }
+}
+
+
+//Funcion para escribir los numeros en el tablero
+void Introduccion (char g [3][3]){
+    int i, j;
+    char aux;
+    
+    aux = '1';
+    
+    for(i = 0; i < 3; i++){
+        for(j = 0; j < 3; j++){
+            g[i][j] = aux++;
+        }
+    }
+}
+
+// Funcion para hacer las lineas de la matriz del tablero
+void Tablero (char g [3][3]){
+    int i, j;
+    
+    for (i = 0; i < 3; i++){
+        for(j = 0; j < 3; j++){
+            if (j < 2){
+                printf(" %c |", g[i][j]);
+            } else{
+                printf(" %c ", g [i][j]);
+            }
+        }
+        if (i < 2){
+            printf("\n-----------\n");
+        }
+    }
+    printf("\n\n");
+}
+
+// Funcion donde le pide al Jugador 1 el espacio de la matriz donde desea tirar y lo escribe en el tablero
+void Turno_Jugador1(char g [3][3]){
+    int i = 0, j = 0, k;
+    char aux;
+    
+    do{
+        do{
+            printf("Turno del jugador 1\n");
+            printf("Escoge la casilla: ");
+            fflush(stdin);
+            scanf("%c", &aux);
+            printf("\n\n");
+        }while(aux < '1' || aux > '9');
+        
+        k = 0;
+        
+        switch (aux){
+            default:
+                printf("Por favor introduzca otra casilla");
+                break;
+            
+            case '1':{
+                i = 0;
+                j = 0;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+            case '2':{
+                i = 0;
+                j = 1;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+            case '3':{
+                i = 0;
+                j = 2;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+              
+            case '4':{
+                i = 1;
+                j = 0;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '5':{
+                i = 1;
+                j = 1;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '6':{
+                i = 1;
+                j = 2;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '7':{
+                i = 2;
+                j = 0;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '8':{
+                i = 2;
+                j = 1;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '9':{
+                i = 2;
+                j = 2;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+
+        }
+    
+    }while (k == 1);
+    
+    g [i][j] = 'X';
+    
+}
+
+// Funcion donde le pide al Jugador 2 el espacio de la matriz donde desea tirar y lo escribe en el tablero
+void Turno_Jugador2(char g [3][3]){
+    int i = 0, j = 0, k;
+    char aux;
+    
+    do{
+        do{
+            printf("Turno del jugador 2\n");
+            printf("Escoge la casilla: ");
+            fflush(stdin);
+            scanf("%c", &aux);
+            printf("\n\n\n");
+        }while(aux < '1' || aux > '9');
+        
+        k = 0;
+        
+        switch (aux){
+            default:
+                printf("Por favor introduzca otra casilla");
+                break;
+            
+            case '1':{
+                i = 0;
+                j = 0;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+            case '2':{
+                i = 0;
+                j = 1;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+            case '3':{
+                i = 0;
+                j = 2;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+              
+            case '4':{
+                i = 1;
+                j = 0;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '5':{
+                i = 1;
+                j = 1;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '6':{
+                i = 1;
+                j = 2;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '7':{
+                i = 2;
+                j = 0;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '8':{
+                i = 2;
+                j = 1;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '9':{
+                i = 2;
+                j = 2;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+
+        }
+    
+    }while (k == 1);
+    
+    g [i][j] = 'O';
+    
+}
+
+// Funcion para crear un numero en aleatorio que posteriormente se leera como una eleccion de un numero donde la maquina deseo tirar
+void Turno_IA (char g[3][3]){
+    int i, j, k;
+    
+    srand (time(NULL));
+    do{
+        i = rand() %3;
+        j = rand() %3;
+        k = 0;
+        
+        if(g[i][j] == 'X' || g[i][j] == 'O'){
+            k = 1;
+        }
+    }while(k == 1);
+    
+    g [i][j] = 'O';
+
+}
+
+// En este tipo de funcion creamos la condicion de gane
+int Condicion (char g[3][3]){
+    if (g[0][0] == 'X' || g[0][0] == 'O'){
+        if (g[0][0] == g[0][1] && g[0][0] == g[0][2]){
+            if (g[0][0] == 'X'){
+                return 0; // Gana el primer turno
+            }
+            else {
+                return 1; // Gana el segundo turno
+            }
+        }
+        if (g[0][0] == g[1][0] && g[0][0] == g[2][0]){
+            if (g[0][0] == 'X'){
+                return 0; // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+    }
+    if (g[1][1] == 'X' || g[1][1] == 'O'){
+        if (g[1][1] == g[0][0] && g[1][1] == g[2][2]){
+            if (g[1][1] == 'X'){
+                return 0; // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+        if(g[1][1] == g[1][0] && g[1][1] == g[1][2]){
+            if (g[1][1] == 'X'){
+                return 0; // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+        if(g[1][1] == g[2][0] && g[1][1] == g[0][2]){
+            if (g[1][1] == 'X'){
+                return 0; // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+        if(g[1][1] == g[0][1] && g[1][1] == g[2][1]){
+            if (g[1][1] == 'X'){
+                return 0; // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+    }
+    if (g[2][2] == 'X' || g[2][2] == 'O'){
+        if (g[2][2] == g[2][0] && g[2][2] == g[2][1]){
+            if (g[2][2] == 'X'){
+                return 0; // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+        if (g[2][2] == g[0][2] && g[2][2] == g[1][2]){
+            if (g[2][2] == 'X'){
+                return 0;  // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+    }
+    return 2;
+    
+}
