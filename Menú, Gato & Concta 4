@@ -1,0 +1,1069 @@
+//
+//  main.c
+//  ProyectoFinal
+//
+//  Created by Dan Sanchez  on 19/12/20.
+//
+
+// Librerias
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+#include <unistd.h>
+
+
+// Area de "defines"
+// Defines para Conecta 4
+#define FILAS 6
+#define COLUMNAS 7
+#define TAMANIO_MATRIZ sizeof(char)*FILAS*COLUMNAS
+#define JUGADOR_1 'o'
+#define JUGADOR_2 'x'
+#define JUGADOR_CPU_1 JUGADOR_1
+#define JUGADOR_CPU_2 JUGADOR_2
+#define ESPACIO_VACIO ' '
+#define FILA_NO_ENCONTRADA -1
+#define ERROR_COLUMNA_LLENA 2
+#define ERROR_FILA_INVALIDA 4
+#define ERROR_NINGUNO 3
+#define CONECTA 4
+#define CONECTA_ARRIBA 1
+#define CONECTA_DERECHA 2
+#define CONECTA_ABAJO_DERECHA 3
+#define CONECTA_ARRIBA_DERECHA 4
+#define NO_CONECTA 0
+#define COLUMNA_GANADORA_NO_ENCONTRADA -1
+#define MODO_HUMANO_CONTRA_HUMANO 1
+#define MODO_HUMANO_CONTRA_CPU 2
+#define MODO_CPU_CONTRA_CPU 3
+
+
+// Prototipo de funciones
+// Prototipo de funciones del "Gato"
+void loop_JvM (char g [3][3]);
+void loop_JvJ (char g [3][3]);
+void Introduccion (char g [3][3]);
+void Tablero (char g [3][3]);
+void Turno_Jugador1 (char g [3][3]);
+void Turno_Jugador2(char g [3][3]);
+void Turno_IA(char g [3][3]);
+int Condicion (char g [3][3]);
+
+// Protipo de funciones del "Conecta 4"
+int contarArriba(int x, int y, char jugador, char tablero[FILAS][COLUMNAS]);
+int contarDerecha(int x, int y, char jugador, char tablero[FILAS][COLUMNAS]);
+int contarArribaDerecha(int x, int y, char jugador, char tablero[FILAS][COLUMNAS]);
+int contarAbajoDerecha(int x, int y, char jugador, char tablero[FILAS][COLUMNAS]);
+int obtenerFilaDesocupada(int columna, char tablero[FILAS][COLUMNAS]);
+int colocarPieza(char jugador, int columna, char tablero[FILAS][COLUMNAS]);
+void limpiarTablero(char tablero[FILAS][COLUMNAS]);
+void dibujarEncabezado(int columnas);
+int dibujarTablero(char tablero[FILAS][COLUMNAS]);
+int esEmpate(char tablero[FILAS][COLUMNAS]);
+char obtenerOponente(char jugador);
+void clonarMatriz(char tableroOriginal[FILAS][COLUMNAS], char destino[FILAS][COLUMNAS]);
+int obtenerColumnaGanadora(char jugador, char tableroOriginal[FILAS][COLUMNAS]);
+int obtenerPrimeraFilaLlena(int columna, char tablero[FILAS][COLUMNAS]);
+void obtenerColumnaEnLaQueSeObtieneMayorPuntaje(char jugador, char tableroOriginal[FILAS][COLUMNAS], int *conteo,int *indice);
+int aleatorio_en_rango(int minimo, int maximo);
+int obtenerColumnaAleatoria(char jugador, char tableroOriginal[FILAS][COLUMNAS]);
+int obtenerColumnaCentral(char jugador, char tableroOriginal[FILAS][COLUMNAS]);
+int elegirColumnaCpu(char jugador, char tablero[FILAS][COLUMNAS]);
+int ganador(char jugador, char tablero[FILAS][COLUMNAS]);
+char elegirJugadorAlAzar();
+int solicitarColumnaAJugador();
+void jugar(int op_Conecta);
+
+
+// Variables
+int op, op_Gato, op_Conecta;
+char g [3][3];
+
+// Funcion principal
+int main() {
+    // Menú
+    printf("Bienvenido!, porfavor degite el juego de su eleccion\n");
+    printf("1) Gato\n");
+    printf("2) Conecta 4\n");
+// Por el momento esta parte del menú estará solo comentada hasta que haya hecho los juegos que como ya se detallo solo serán un extra
+//    printf("3) Snake\n");
+//    printf("4) Pong\n");
+    printf("\nEl juego que deseo juegas es: ");
+    scanf("%d", &op);
+    printf("\n\n\n\n");
+    
+    switch (op) {
+        
+        // Esta area es para el juego del "Gato con un menú y las funciones correspondientes para el modo de juego que el usuario desee
+        case 1:
+            // Menú del juego
+            printf("Bienvenido al juego de Gato!\n\n");
+            printf("Por favor eliga un modo de juego\n");
+            printf("1) Jugador vs Maquina\n");
+            printf("2) Jugados vs Jugador\n");
+            printf("\nMi eleccion es: ");
+            scanf("%d", &op_Gato);
+            printf("\n\n\n");
+            
+            // Apartir de aqui empieza a correr el juego como tal
+            switch(op_Gato){
+                default:
+                    printf("\n\nLo sentimos esta opcion aún no esta disponible\n");
+                    printf("Por favor, escoga otra opción\n\n");
+                    printf("By: Dan Sanchez\n\n");
+                    break;
+                case 1:
+                    loop_JvM(g);
+                    break;
+                    
+                case 2:
+                    loop_JvJ(g);
+                    break;
+            }
+            break;
+            
+        // Esta area es para el juego del "Conecta 4" con un menú y las funciones correspondientes para el modo de juego que el usuario desee
+        case 2:
+            // Menú del juego
+            printf("Bienvenido al juego de Conecta 4!\n\n");
+            printf("Por favor elija un modo de juego\n");
+            printf("1) Jugador vs Jugador\n");
+            printf("2) Jugados vs Maquina\n");
+            printf("\nMi eleccion es: ");
+            scanf("%d", &op_Conecta);
+            printf("\n\n\n");
+            
+            if (op_Conecta <= 0 || op_Conecta > 3) {
+                return 0;
+            }
+            jugar(op_Conecta);
+            return 0;
+            
+            break;
+            
+            
+        case 3:
+            
+            break;
+        
+            
+        case 4:
+            
+            break;
+            
+        
+        default:
+            printf("\n\nLo sentimos esta opcion aún no esta disponible\n");
+            printf("Por favor, escoga otra opción\n\n");
+            printf("By: Dan Sanchez\n\n");
+            break;
+    }
+    
+}
+
+
+// Funciones del "Gato"
+// Funciones donde van anidadas las funciones que hacen correr el juego en el modo "Jugador vs Maquina" y todas queden dentro de una sola funcion
+void loop_JvM (char g [3][3]){
+    int i, j;
+    
+    i = 0;
+    
+    Introduccion(g);
+    do{
+        // system ("clear");
+        Tablero(g);
+        if (i%2 == 0){
+            Turno_Jugador1(g);
+        } else {
+            Turno_IA(g);
+            printf("\n\n");
+        }
+        j = Condicion(g);
+        i++;
+        
+    } while (i <= 9 && j == 2);
+    // system ("clear")
+    Tablero(g);
+    
+    if (j == 0){
+        printf("\nGANASTE!!!\n");
+        printf("By: Dan Sanchez\n\n");
+    } else if (j == 1){
+        printf("\nPerdiste:(\n");
+        printf("By: Dan Sanchez\n\n");
+    } else {
+        printf("\nVaya empate!, Vuelvelo a intentar\n");
+        printf("By: Dan Sanchez\n\n");
+    }
+}
+
+// Funciones donde van anidadas las funciones que hacen correr el juego en el modo "Jugador vs Jugador" y todas queden dentro de una sola funcion
+void loop_JvJ (char g [3][3]){
+    int i, j;
+    
+    i = 0;
+    
+    Introduccion(g);
+    do{
+        // system ("clear");
+        Tablero(g);
+        if (i%2 == 0){
+            Turno_Jugador1(g);
+        } else {
+            Turno_Jugador2(g);
+            printf("\n\n");
+        }
+        j = Condicion(g);
+        i++;
+        
+    } while (i <= 9 && j == 2);
+    // system ("clear")
+    Tablero(g);
+    
+    if (j == 0){
+        printf("\nGANASTE JUGADOR 1!!!\n");
+        printf("By: Dan Sanchez\n\n");
+    } else if (j == 1){
+        printf("\nGANASTE JUGADOR 2!!!\n");
+        printf("By: Dan Sanchez\n\n");
+    } else {
+        printf("\nVaya empate!, Vuelvanlo a intentar\n");
+        printf("By: Dan Sanchez\n\n");
+    }
+}
+
+
+//Funcion para escribir los numeros en el tablero
+void Introduccion (char g [3][3]){
+    int i, j;
+    char aux;
+    
+    aux = '1';
+    
+    for(i = 0; i < 3; i++){
+        for(j = 0; j < 3; j++){
+            g[i][j] = aux++;
+        }
+    }
+}
+
+// Funcion para hacer las lineas de la matriz del tablero
+void Tablero (char g [3][3]){
+    int i, j;
+    
+    for (i = 0; i < 3; i++){
+        for(j = 0; j < 3; j++){
+            if (j < 2){
+                printf(" %c |", g[i][j]);
+            } else{
+                printf(" %c ", g [i][j]);
+            }
+        }
+        if (i < 2){
+            printf("\n-----------\n");
+        }
+    }
+    printf("\n\n");
+}
+
+// Funcion donde le pide al Jugador 1 el espacio de la matriz donde desea tirar y lo escribe en el tablero
+void Turno_Jugador1(char g [3][3]){
+    int i = 0, j = 0, k;
+    char aux;
+    
+    do{
+        do{
+            printf("Turno del jugador 1\n");
+            printf("Escoge la casilla: ");
+            fflush(stdin);
+            scanf("%c", &aux);
+            printf("\n\n");
+        }while(aux < '1' || aux > '9');
+        
+        k = 0;
+        
+        switch (aux){
+            default:
+                printf("Por favor introduzca otra casilla");
+                break;
+            
+            case '1':{
+                i = 0;
+                j = 0;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+            case '2':{
+                i = 0;
+                j = 1;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+            case '3':{
+                i = 0;
+                j = 2;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+              
+            case '4':{
+                i = 1;
+                j = 0;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '5':{
+                i = 1;
+                j = 1;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '6':{
+                i = 1;
+                j = 2;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '7':{
+                i = 2;
+                j = 0;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '8':{
+                i = 2;
+                j = 1;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '9':{
+                i = 2;
+                j = 2;
+                
+                if (g [i][j] == 'X' || g[i][j] == 'O'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+
+        }
+    
+    }while (k == 1);
+    
+    g [i][j] = 'X';
+    
+}
+
+// Funcion donde le pide al Jugador 2 el espacio de la matriz donde desea tirar y lo escribe en el tablero
+void Turno_Jugador2(char g [3][3]){
+    int i = 0, j = 0, k;
+    char aux;
+    
+    do{
+        do{
+            printf("Turno del jugador 2\n");
+            printf("Escoge la casilla: ");
+            fflush(stdin);
+            scanf("%c", &aux);
+            printf("\n\n\n");
+        }while(aux < '1' || aux > '9');
+        
+        k = 0;
+        
+        switch (aux){
+            default:
+                printf("Por favor introduzca otra casilla");
+                break;
+            
+            case '1':{
+                i = 0;
+                j = 0;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+            case '2':{
+                i = 0;
+                j = 1;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+            case '3':{
+                i = 0;
+                j = 2;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+              
+            case '4':{
+                i = 1;
+                j = 0;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '5':{
+                i = 1;
+                j = 1;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '6':{
+                i = 1;
+                j = 2;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '7':{
+                i = 2;
+                j = 0;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '8':{
+                i = 2;
+                j = 1;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+                
+            case '9':{
+                i = 2;
+                j = 2;
+                
+                if (g [i][j] == 'O' || g[i][j] == 'X'){
+                    k = 1;
+                    printf("CASILLA OCUPADA! Escoga otra\n\n");
+                }
+                break;
+            }
+
+        }
+    
+    }while (k == 1);
+    
+    g [i][j] = 'O';
+    
+}
+
+// Funcion para crear un numero en aleatorio que posteriormente se leera como una eleccion de un numero donde la maquina deseo tirar
+void Turno_IA (char g[3][3]){
+    int i, j, k;
+    
+    srand (time(NULL));
+    do{
+        i = rand() %3;
+        j = rand() %3;
+        k = 0;
+        
+        if(g[i][j] == 'X' || g[i][j] == 'O'){
+            k = 1;
+        }
+    }while(k == 1);
+    
+    g [i][j] = 'O';
+
+}
+
+// En este tipo de funcion creamos la condicion de gane
+int Condicion (char g[3][3]){
+    if (g[0][0] == 'X' || g[0][0] == 'O'){
+        if (g[0][0] == g[0][1] && g[0][0] == g[0][2]){
+            if (g[0][0] == 'X'){
+                return 0; // Gana el primer turno
+            }
+            else {
+                return 1; // Gana el segundo turno
+            }
+        }
+        if (g[0][0] == g[1][0] && g[0][0] == g[2][0]){
+            if (g[0][0] == 'X'){
+                return 0; // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+    }
+    if (g[1][1] == 'X' || g[1][1] == 'O'){
+        if (g[1][1] == g[0][0] && g[1][1] == g[2][2]){
+            if (g[1][1] == 'X'){
+                return 0; // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+        if(g[1][1] == g[1][0] && g[1][1] == g[1][2]){
+            if (g[1][1] == 'X'){
+                return 0; // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+        if(g[1][1] == g[2][0] && g[1][1] == g[0][2]){
+            if (g[1][1] == 'X'){
+                return 0; // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+        if(g[1][1] == g[0][1] && g[1][1] == g[2][1]){
+            if (g[1][1] == 'X'){
+                return 0; // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+    }
+    if (g[2][2] == 'X' || g[2][2] == 'O'){
+        if (g[2][2] == g[2][0] && g[2][2] == g[2][1]){
+            if (g[2][2] == 'X'){
+                return 0; // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+        if (g[2][2] == g[0][2] && g[2][2] == g[1][2]){
+            if (g[2][2] == 'X'){
+                return 0;  // Gana el primer turno
+            } else {
+                return 1; // Gana el segundo turno
+            }
+        }
+    }
+    return 2;
+    
+}
+
+ 
+// Funciones del "Conecta 4"
+// Funciones para el tablero del juego
+int obtenerFilaDesocupada(int columna, char tablero[FILAS][COLUMNAS]) {
+    int i;
+    
+    for (i = FILAS - 1; i >= 0; i--) {
+        if (tablero[i][columna] == ESPACIO_VACIO) {
+            return i;
+        }
+    }
+    return FILA_NO_ENCONTRADA;
+}
+
+int colocarPieza(char jugador, int columna, char tablero[FILAS][COLUMNAS]) {
+    
+    if (columna < 0 || columna >= COLUMNAS) {
+        return ERROR_FILA_INVALIDA;
+    }
+    
+    int fila = obtenerFilaDesocupada(columna, tablero);
+    if (fila == FILA_NO_ENCONTRADA) {
+        return ERROR_COLUMNA_LLENA;
+    }
+    tablero[fila][columna] = jugador;
+    return ERROR_NINGUNO;
+}
+
+
+void limpiarTablero(char tablero[FILAS][COLUMNAS]) {
+    int i;
+    
+    for (i = 0; i < FILAS; i++) {
+        int j;
+    
+        for (j = 0; j < COLUMNAS; ++j) {
+            tablero[i][j] = ESPACIO_VACIO;
+        }
+    }
+}
+
+void dibujarEncabezado(int columnas) {
+    
+    printf("\n");
+    int i;
+   
+    for (i = 0; i < columnas; ++i) {
+        printf("|%d", i + 1);
+      
+        if (i + 1 >= columnas) {
+            printf("|");
+        }
+
+    }
+}
+
+int dibujarTablero(char tablero[FILAS][COLUMNAS]) {
+    dibujarEncabezado(COLUMNAS);
+    printf("\n");
+    int i;
+    
+    for (i = 0; i < FILAS; i++) {
+        int j;
+        
+        for (j = 0; j < COLUMNAS; j++) {
+            printf("|%c", tablero[i][j]);
+            if (j + 1 >= COLUMNAS) {
+                printf("|");
+            }
+        }
+        printf("\n");
+    }
+    return 0;
+}
+
+
+int esEmpate(char tablero[FILAS][COLUMNAS]) {
+    int i;
+   
+    for (i = 0; i < COLUMNAS; i++) {
+        int resultado = obtenerFilaDesocupada(i, tablero);
+        
+        if (resultado != FILA_NO_ENCONTRADA) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+//Funciones hacer el conteo de conexiones
+// Hace el conteo por columnas
+int contarArriba(int x, int y, char jugador, char tablero[FILAS][COLUMNAS]) {
+    int yInicio = (y - CONECTA >= 0) ? y - CONECTA + 1 : 0;
+    int contador = 0;
+    
+    for (; yInicio <= y; yInicio++) {
+        
+        if (tablero[yInicio][x] == jugador) {
+            contador++;
+        } else {
+            contador = 0;
+        }
+    
+    }
+    return contador;
+}
+
+// Hace el conteo por renglones
+int contarDerecha(int x, int y, char jugador, char tablero[FILAS][COLUMNAS]) {
+    int xFin = (x + CONECTA < COLUMNAS) ? x + CONECTA - 1 : COLUMNAS - 1;
+    int contador = 0;
+    
+    for (; x <= xFin; x++) {
+        
+        if (tablero[y][x] == jugador) {
+            contador++;
+        
+        } else {
+            contador = 0;
+        }
+    }
+   
+    return contador;
+}
+
+// Hace el conteo en diagonal hacia arriba
+int contarArribaDerecha(int x, int y, char jugador, char tablero[FILAS][COLUMNAS]) {
+    int xFin = (x + CONECTA < COLUMNAS) ? x + CONECTA - 1 : COLUMNAS - 1;
+    int yInicio = (y - CONECTA >= 0) ? y - CONECTA + 1 : 0;
+    int contador = 0;
+    
+    while (x <= xFin && yInicio <= y) {
+        
+        if (tablero[y][x] == jugador) {
+            contador++;
+        
+        } else {
+            contador = 0;
+        }
+        
+        x++;
+        y--;
+    }
+    return contador;
+}
+
+// Hace el conteo en diagonal hacia abajo
+int contarAbajoDerecha(int x, int y, char jugador, char tablero[FILAS][COLUMNAS]) {
+    int xFin = (x + CONECTA < COLUMNAS) ? x + CONECTA - 1 : COLUMNAS - 1;
+    int yFin = (y + CONECTA < FILAS) ? y + CONECTA - 1 : FILAS - 1;
+    int contador = 0;
+    
+    while (x <= xFin && y <= yFin) {
+        
+        if (tablero[y][x] == jugador) {
+            contador++;
+        
+        } else {
+            contador = 0;
+        }
+        
+        x++;
+        y++;
+    }
+    
+    return contador;
+}
+
+// Revisa si alguien ya realizo 4 conexiones, anida las otras funciones
+int ganador(char jugador, char tablero[FILAS][COLUMNAS]) {
+    int y;
+    
+    for (y = 0; y < FILAS; y++) {
+        int x;
+        
+        for (x = 0; x < COLUMNAS; x++) {
+            int conteoArriba = contarArriba(x, y, jugador, tablero);
+            
+            if (conteoArriba >= CONECTA) {
+                return CONECTA_ARRIBA;
+            }
+            
+            if (contarDerecha(x, y, jugador, tablero) >= CONECTA) {
+                return CONECTA_DERECHA;
+            }
+            
+            if (contarArribaDerecha(x, y, jugador, tablero) >= CONECTA) {
+                return CONECTA_ARRIBA_DERECHA;
+            }
+            
+            if (contarAbajoDerecha(x, y, jugador, tablero) >= CONECTA) {
+                return CONECTA_ABAJO_DERECHA;
+            }
+        }
+    }
+    
+    return NO_CONECTA;
+}
+
+// Funciones de IA
+void clonarMatriz(char tableroOriginal[FILAS][COLUMNAS], char destino[FILAS][COLUMNAS]) {
+    memcpy(destino, tableroOriginal, TAMANIO_MATRIZ);
+}
+
+int obtenerColumnaGanadora(char jugador, char tableroOriginal[FILAS][COLUMNAS]) {
+    char tablero[FILAS][COLUMNAS];
+    int i;
+    
+    for (i = 0; i < COLUMNAS; i++) {
+        clonarMatriz(tableroOriginal, tablero);
+        int resultado = colocarPieza(jugador, i, tablero);
+        
+        if (resultado == ERROR_NINGUNO) {
+            int gana = ganador(jugador, tablero);
+           
+            if (gana != NO_CONECTA) {
+                return i;
+            }
+        }
+    }
+    
+    return COLUMNA_GANADORA_NO_ENCONTRADA;
+}
+
+int obtenerPrimeraFilaLlena(int columna, char tablero[FILAS][COLUMNAS]) {
+    int i;
+    
+    for (i = 0; i < FILAS; i++) {
+        
+        if (tablero[i][columna] != ESPACIO_VACIO) {
+            return i;
+        }
+    }
+    
+    return FILA_NO_ENCONTRADA;
+}
+
+// Los dos últimos apuntadores son porque no podemos regresar dos variables
+void obtenerColumnaEnLaQueSeObtieneMayorPuntaje(char jugador, char tableroOriginal[FILAS][COLUMNAS], int *conteo, int *indice) {
+
+    int conteoMayor = 0,
+            indiceColumnaConConteoMayor = -1;
+    char tablero[FILAS][COLUMNAS];
+    int i;
+    
+    for (i = 0; i < COLUMNAS; i++) {
+        clonarMatriz(tableroOriginal, tablero);
+        int estado = colocarPieza(jugador, i, tablero);
+        
+        if (estado == ERROR_NINGUNO) {
+            int filaDePiezaRecienColocada = obtenerPrimeraFilaLlena(i, tablero);
+            
+            if (filaDePiezaRecienColocada != FILA_NO_ENCONTRADA) {
+                
+                int c = contarArriba(i, filaDePiezaRecienColocada, jugador, tablero);
+                if (c > conteoMayor) {
+                    conteoMayor = c;
+                    indiceColumnaConConteoMayor = i;
+                }
+                
+                c = contarArribaDerecha(i, filaDePiezaRecienColocada, jugador, tablero);
+                if (c > conteoMayor) {
+                    conteoMayor = c;
+                    indiceColumnaConConteoMayor = i;
+                }
+                
+                c = contarDerecha(i, filaDePiezaRecienColocada, jugador, tablero);
+                if (c > conteoMayor) {
+                    conteoMayor = c;
+                    indiceColumnaConConteoMayor = i;
+                }
+                
+                c = contarAbajoDerecha(i, filaDePiezaRecienColocada, jugador, tablero);
+                if (c > conteoMayor) {
+                    conteoMayor = c;
+                    indiceColumnaConConteoMayor = i;
+                }
+            }
+        }
+    }
+    
+    *conteo = conteoMayor;
+    *indice = indiceColumnaConConteoMayor;
+}
+
+int obtenerColumnaAleatoria(char jugador, char tableroOriginal[FILAS][COLUMNAS]) {
+    
+    while (1) {
+        char tablero[FILAS][COLUMNAS];
+        clonarMatriz(tableroOriginal, tablero);
+        int columna = aleatorio_en_rango(0, COLUMNAS - 1);
+        int resultado = colocarPieza(jugador, columna, tablero);
+        
+        if (resultado == ERROR_NINGUNO) {
+            return columna;
+        }
+    }
+}
+
+int obtenerColumnaCentral(char jugador, char tableroOriginal[FILAS][COLUMNAS]) {
+    char tablero[FILAS][COLUMNAS];
+    clonarMatriz(tableroOriginal, tablero);
+    int mitad = (COLUMNAS - 1) / 2;
+    int resultado = colocarPieza(jugador, mitad, tablero);
+    
+    if (resultado == ERROR_NINGUNO) {
+        return mitad;
+    }
+    return COLUMNA_GANADORA_NO_ENCONTRADA;
+}
+
+int elegirColumnaCpu(char jugador, char tablero[FILAS][COLUMNAS]) {
+    // Voy a comprobar si puedo ganar...
+    int posibleColumnaGanadora = obtenerColumnaGanadora(jugador, tablero);
+    
+    if (posibleColumnaGanadora != COLUMNA_GANADORA_NO_ENCONTRADA) {
+        printf("*Elijo ganar*\n");
+        return posibleColumnaGanadora;
+    }
+    
+    // Si no, voy a comprobar si mi oponente gana con el siguiente movimiento, para evitarlo
+    char oponente = obtenerOponente(jugador);
+    int posibleColumnaGanadoraDeOponente = obtenerColumnaGanadora(oponente, tablero);
+    if (posibleColumnaGanadoraDeOponente != COLUMNA_GANADORA_NO_ENCONTRADA) {
+        printf("*Elijo evitar que mi oponente gane*\n");
+        return posibleColumnaGanadoraDeOponente;
+    }
+    
+    // En caso de que nadie pueda ganar en el siguiente movimiento, buscaré en dónde se obtiene el mayor puntaje al colocar la pieza
+    int conteoCpu, columnaCpu;
+    obtenerColumnaEnLaQueSeObtieneMayorPuntaje(jugador, tablero, &conteoCpu, &columnaCpu);
+    int conteoOponente, columnaOponente;
+    obtenerColumnaEnLaQueSeObtieneMayorPuntaje(oponente, tablero, &conteoOponente, &columnaOponente);
+    
+    if (conteoOponente > conteoCpu) {
+        printf("*Elijo quitarle el puntaje a mi oponente*\n");
+        return columnaOponente;
+    
+    } else if (conteoCpu > 1) {
+        printf("*Elijo colocarla en donde obtengo un mayor puntaje*\n");
+     
+        return columnaCpu;
+    }
+  
+    // Si no, regresar la central por si está desocupada
+    int columnaCentral = obtenerColumnaCentral(jugador, tablero);
+    
+    if (columnaCentral != COLUMNA_GANADORA_NO_ENCONTRADA) {
+        printf("*Elijo ponerla en el centro*\n");
+        return columnaCentral;
+    }
+    
+    // Finalmente, devolver la primera disponible de manera aleatoria
+    int columna = obtenerColumnaAleatoria(jugador, tablero);
+    
+    if (columna != FILA_NO_ENCONTRADA) {
+        printf("*Elijo la primera vacía aleatoria*\n");
+        return columna;
+    }
+    printf("Esto no debería suceder\n");
+    return 0;
+}
+
+// Funciones necesarias para el funcionamiento completo del juego
+char obtenerOponente(char jugador) {
+    
+    if (jugador == JUGADOR_1) {
+        return JUGADOR_2;
+    
+    } else {
+        return JUGADOR_1;
+    }
+}
+
+int aleatorio_en_rango(int minimo, int maximo) {
+    return minimo + rand() / (RAND_MAX / (maximo - minimo + 1) + 1);
+}
+
+char elegirJugadorAlAzar() {
+    int numero = aleatorio_en_rango(0, 1);
+
+    if (numero) {
+        return JUGADOR_1;
+
+    } else {
+        return JUGADOR_2;
+    }
+}
+
+
+int solicitarColumnaAJugador() {
+    int columna = 0;
+    printf("Escribe la columna en donde colocar la pieza: ");
+    scanf("%d", &columna);
+    // Necesitamos índices de arreglos
+    columna--;
+
+    return columna;
+}
+
+// Funcion donde anida todas las anteriores funciones para el funcionamiento correcto del juego
+void jugar(int op_Conecta) {
+    char tablero[FILAS][COLUMNAS];
+    limpiarTablero(tablero);
+    char jugadorActual = elegirJugadorAlAzar();
+    printf("Comienza el jugador %c\n", jugadorActual);
+    
+    while (1) {
+        int columna = 0;
+        printf("\n\nTurno del jugador %c", jugadorActual);
+        dibujarTablero(tablero);
+        
+        // Esta seccion es para saber que modo de juego será
+        // Primero será modo Jugador vs Maquina
+        if (op_Conecta == MODO_HUMANO_CONTRA_CPU) {
+            if (jugadorActual == JUGADOR_CPU_2) {
+                printf("CPU 2 analizando...  ");
+                columna = elegirColumnaCpu(jugadorActual, tablero);
+            } else {
+                columna = solicitarColumnaAJugador();
+            }
+        
+        // Esta parte del codigo sera una sorpresa para el jugador
+        // Será un modo CPU vs CPU
+        } else if (op_Conecta == MODO_CPU_CONTRA_CPU) {
+            printf("CPU %d analizando...  ", jugadorActual == JUGADOR_CPU_1 ? 1 : 2);
+            columna = elegirColumnaCpu(jugadorActual, tablero);
+        
+        // Esta perte es para la opción Jugador vs Jugador
+        } else if (op_Conecta == MODO_HUMANO_CONTRA_HUMANO) {
+            columna = solicitarColumnaAJugador();
+        }
+        
+        // Esta parte es por si hay algun problema a la ora de poner la pieza
+        int estado = colocarPieza(jugadorActual, columna, tablero);
+        if (estado == ERROR_COLUMNA_LLENA) {
+            printf("Error: Columna llena");
+        } else if (estado == ERROR_FILA_INVALIDA) {
+            printf("Error: Fila no correcta");
+        } else if (estado == ERROR_NINGUNO) {
+            int g = ganador(jugadorActual, tablero);
+            if (g != NO_CONECTA) {
+                dibujarTablero(tablero);
+                // Esta parte es para poner quien ah ganado
+                printf("Gana el jugador %c. \n", jugadorActual);
+                printf("By: Dan Sanchez\n\n");
+                break;
+            } else if (esEmpate(tablero)) {
+                dibujarTablero(tablero);
+                printf("EMPATEEE!");
+                printf("By: Dan Sanchez\n\n");
+                break;
+            }
+        }
+        
+        jugadorActual = obtenerOponente(jugadorActual);
+    }
+}
+
